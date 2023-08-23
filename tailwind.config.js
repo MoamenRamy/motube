@@ -4,6 +4,10 @@ import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    blocklist: [
+        'container',
+        'collapse',
+    ],
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './vendor/laravel/jetstream/**/*.blade.php',

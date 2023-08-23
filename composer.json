@@ -7,11 +7,13 @@
     "require": {
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
+        "intervention/image": "^2.7",
         "laravel/framework": "^10.10",
         "laravel/jetstream": "^3.3",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
-        "livewire/livewire": "^2.11"
+        "livewire/livewire": "^2.11",
+        "pbmedia/laravel-ffmpeg": "^8.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
