@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->string('disc');
             $table->string('video_path');
             $table->string('image_path');
@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('seconds')->nullable();
             $table->string('minutes')->nullable();
             $table->string('quality')->nullable();
-            $table->boolean('processed');
-            $table->boolean('longitudianl');
+            $table->boolean('processed')->default(false);
+            $table->boolean('longitudianl')->default(false);
             $table->timestamps();
         });
     }
