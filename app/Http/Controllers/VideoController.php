@@ -6,11 +6,8 @@ use App\Jobs\ConvertVideoForStreaming;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
-use Illuminate\Support\Facades\Storage;
+use Storage;
 use Illuminate\Support\Str;
-
-
-
 
 class VideoController extends Controller
 {
@@ -41,31 +38,36 @@ class VideoController extends Controller
             'video' => 'required',
         ]);
 
-        $randompath = Str::random(16);
-        $videopath = $randompath . '.' . $request->video->getClientOriginalExtension();
-        $imagepath = $randompath . '.' . $request->image->getClientOriginalExtension();
+
+        $randomPath = Str::random(16);
+        $videoPath = $randomPath . '.' . $request->video->getClientOriginalExtension();
+        $imagePath = $randomPath . '.' . $request->image->getClientOriginalExtension();
 
         $image = Image::make($request->image)->resize(320, 180);
 
+        $path = Storage::put($imagePath, $image->stream());
 
-        $path = Storage::put($imagepath, $image->stream());
-
-
-        $request->video->storeAs('/', $videopath, 'public');
+        $request->video->storeAs('/', $videoPath, 'public');
 
         $video = Video::create([
-            'disc' => 'public',
-            'video_path' => $videopath,
-            'image_path' => $imagepath,
-            'title' => $request->title,
-            'user_id' => auth()->id()
+            'disk'        => 'public',
+            'video_path'  => $videoPath,
+            'image_path'  => $imagePath,
+            'title'       => $request->title,
+            'user_id'     => auth()->id(),
         ]);
+
+        // $view = View::create([
+        //     'video_id' => $video->id,
+        //     'user_id' => auth()->id(),
+        //     'views_number' => 0
+        // ]);
 
         ConvertVideoForStreaming::dispatch($video);
 
         return redirect()->back()->with(
             'success',
-            'The video clip will be available in the shortest time when we finish processing it'
+            'سيكون مقطع الفيديو متوفر في أقصر وقت عندما ننتهي من معالجته'
         );
     }
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('title')->nullable();
-            $table->string('disc');
+            $table->string('disk');
             $table->string('video_path');
             $table->string('image_path');
             $table->string('hours')->nullable();
