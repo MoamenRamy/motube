@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ConvertVideoForStreaming;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Intervention\Image\ImageManagerStatic as Image;
 use Storage;
 use Illuminate\Support\Str;
@@ -63,7 +64,7 @@ class VideoController extends Controller
         //     'views_number' => 0
         // ]);
 
-        ConvertVideoForStreaming::dispatch($video);
+        Bus::dispatch(new ConvertVideoForStreaming($video));
 
         return redirect()->back()->with(
             'success',
