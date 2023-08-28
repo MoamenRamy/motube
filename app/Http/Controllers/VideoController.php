@@ -39,7 +39,6 @@ class VideoController extends Controller
             'video' => 'required',
         ]);
 
-
         $randomPath = Str::random(16);
         $videoPath = $randomPath . '.' . $request->video->getClientOriginalExtension();
         $imagePath = $randomPath . '.' . $request->image->getClientOriginalExtension();
@@ -58,17 +57,11 @@ class VideoController extends Controller
             'user_id'     => auth()->id(),
         ]);
 
-        // $view = View::create([
-        //     'video_id' => $video->id,
-        //     'user_id' => auth()->id(),
-        //     'views_number' => 0
-        // ]);
-
         Bus::dispatch(new ConvertVideoForStreaming($video));
 
         return redirect()->back()->with(
             'success',
-            'سيكون مقطع الفيديو متوفر في أقصر وقت عندما ننتهي من معالجته'
+            "The video will be available next season when he hasn't finished processing it."
         );
     }
 
