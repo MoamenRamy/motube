@@ -2,13 +2,16 @@
 
 @section('content')
     <div class="mx-4">
+        @if($videos->count() > 0)
         <div class="row justify-content-center">
-            <form class="form-inline col-md-6 justify-content-center" action="{{ route('video.search') }}" method="GET">
-                <input type="text" class="form-control mx-sm-3 mb-2" name="term">
-                <button type="submit" class="btn btn-secondary mb-2">search</button>
+            <form class="form-inline col-md-6 justify-content-center" method="POST" action="{{ route('history.distroyAll') }}" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف السجل بشكلٍ كامل؟')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-secondary mb-2">delete History</button></button>
             </form>
         </div>
         <hr>
+        @endif
         <br>
 
         <p class="my-4">{{$title}}</p>
@@ -27,13 +30,13 @@
                                 @php
                                     $seconds_add_zero = sprintf("%02d", $video->seconds);
                                 @endphp
-                                <a href="{{route('videos.show', $video->id)}}">
+                                <a href="/videos/{{$video->id}}">
                                     <img src="{{ Storage::url($video->image_path) }}" class="card-img-top" alt="...">
-                                    <time>{{($video->hours) > 0 ? $hours_add_zero. ":" : ""}}{{$minutes_add_zero}}:{{$seconds_add_zero}}</time>
+                                    <time>{{ ($video->hours) > 0 ? $hours_add_zero .':' : ''}}{{$minutes_add_zero}}:{{$seconds_add_zero}}</time>
                                     <i class="fas fa-play fa-2x"></i>
                                 </a>
                             </div>
-                            <a href="{{route('videos.show', $video->id)}}">
+                            <a href="/videos/{{$video->id}}">
                                 <div class="card-body p-0">
                                     <p class="card-title">{{ Str::limit($video->title, 60) }}</p>
                                 </div>
@@ -41,24 +44,18 @@
                             <div class="card-footer">
                                 <small class="text-muted">
                                     @foreach ($video->views as $view)
-                                    <span class="d-block"><i class="fas fa-eye"></i> {{$view->views_number}} views </span>
+                                         <span class="d-block"><i class="fas fa-eye"></i> {{$view->views_number}} مشاهدة</span>
                                     @endforeach
-                                    <i class="fas fa-clock"></i> <span>{{$video->created_at->diffForHumans()}}</span>
+
+                                    <i class="fas fa-clock"></i> <span>{{$video->pivot->created_at->diffForHumans()}}</span>
+
                                     @auth
                                         @if ($video->user_id == auth()->user()->id || auth()->user()->administration_level > 0)
-                                            @if (!auth()->user()->block)
-                                                <form method="POST" action="{{route('videos.destroy', $video->id)}}" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف مقطع الفيديو هذا؟')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="float-left"><i class="far fa-trash-alt text-danger fa-lg"></i></button>
-                                                </form>
-
-                                                <form method="GET" action="{{route('videos.edit', $video->id)}}">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="float-left"><i class="far fa-edit text-success fa-lg ml-3"></i></button>
-                                                </form>
-                                            @endif
+                                            <form method="POST" action="{{route('history.destroy', $video->pivot->id)}}" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف مقطع الفيديو هذا؟')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="float-left"><i class="far fa-trash-alt text-danger fa-lg"></i></button>
+                                            </form>
                                         @endif
                                     @endauth
                                 </small>
@@ -69,7 +66,7 @@
             @empty
                 <div class="mx-auto col-8">
                     <div class="alert alert-primary text-center" role="alert">
-                        There are no videos
+                         there is no videos
                     </div>
                 </div>
             @endforelse

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('minutes')->nullable();
             $table->string('quality')->nullable();
             $table->boolean('processed')->default(false);
-            $table->boolean('longitudianl')->default(false);
+            $table->boolean('Longitudinal')->default(false);
             $table->timestamps();
         });
     }

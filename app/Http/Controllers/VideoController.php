@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ConvertVideoForStreaming;
 use App\Models\Convertedvideo;
+use App\Models\Like;
 use App\Models\Video;
+use App\Models\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Intervention\Image\ImageManagerStatic as Image;
 use Storage;
@@ -15,7 +18,7 @@ class VideoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except(['show', 'addView']);
     }
     /**
      * Display a listing of the resource.
@@ -64,6 +67,12 @@ class VideoController extends Controller
             'user_id'     => auth()->id(),
         ]);
 
+        $view = View::create([
+            'video_id' => $video->id,
+            'user_id' => auth()->id(),
+            'views_number' => 0,
+        ]);
+
         Bus::dispatch(new ConvertVideoForStreaming($video));
 
         return redirect()->back()->with(
@@ -75,9 +84,25 @@ class VideoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Video $video)
     {
-        //
+        $countLike = Like::where('video_id', $video->id)->where('like', '1')->count();
+        $countDislike = Like::where('video_id', $video->id)->where('like', '0')->count();
+
+        $user = Auth::user();
+        if(Auth::check()) {
+            $userLike = $user->likes()->where('video_id', $video->id)->first();
+        } else {
+            $userLike = 0;
+        }
+
+        if(Auth::check()) {
+            auth()->user()->videoInHistory()->attach($video->id);
+        }
+
+        $comments = $video->comments->sortByDesc('created_at');
+
+        return view('videos.show-video', compact('video', 'countLike', 'countDislike', 'userLike', 'comments'));
     }
 
     /**
@@ -157,5 +182,17 @@ class VideoController extends Controller
         $videos = Video::where('title', 'like', "%{$request->term}%")->paginate(12);
         $title = 'Display search results for :'. $request->term;
         return view('videos.my-videos', compact('videos', 'title'));
+    }
+
+    public function addView(Request $request)
+    {
+        $views = View::where('video_id', $request->videoId)->first();
+
+        $views->views_number++;
+
+        $views->save();
+
+        $viewsNumbers = $views->views_number;
+        return response()->json(['viewsNumbers' => $viewsNumbers]);
     }
 }
