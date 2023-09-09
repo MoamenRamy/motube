@@ -185,7 +185,7 @@
             event.preventDefault();
             var html='<div class="alert alert-danger">\
                         <ul>\
-                            <li class="loginAlert">يجب تسجيل الدخول لكي تستطيع الإعجاب بالفيديو</li>\
+                            <li class="loginAlert">You must be logged in to be able to like the video</li>\
                         </ul>\
                     </div>';
             $(".loginAlert").html(html);
@@ -194,7 +194,7 @@
             event.preventDefault();
             var html='<div class="alert alert-danger">\
                         <ul>\
-                            <li class="loginAlert">أنت ممنوع من الإعجاب</li>\
+                            <li class="loginAlert">You are forbidden from liking</li>\
                         </ul>\
                     </div>';
             $(".loginAlert").html(html);
@@ -282,7 +282,7 @@
             event.preventDefault();
             var html='<div class="alert alert-danger">\
                     <ul>\
-                        <li>يجب تسجيل الدخول لكي تستطيع التعليق على الفيديو</li>\
+                        <li>You must be logged in to be able to comment on the video</li>\
                     </ul>\
                 </div>';
             $(".commentAlert ").html(html);
@@ -290,7 +290,7 @@
         else if (blocked == '1') {
             var html='<div class="alert alert-danger">\
                         <ul>\
-                            <li class="commentAlert">أنت ممنوع من التعليق</li>\
+                            <li class="commentAlert">You are prohibited from commenting</li>\
                         </ul>\
                     </div>';
             $(".commentAlert ").html(html);
@@ -299,7 +299,7 @@
         else if ($('#comment').val().length == 0) {
             var html='<div class="alert alert-danger">\
                     <ul>\
-                        <li>الرجاء كتابة تعليق</li>\
+                        <li>Please write a comment</li>\
                     </ul>\
                 </div>';
             $(".commentAlert ").html(html);

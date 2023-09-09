@@ -107,9 +107,9 @@
                                 <img class="h-8 w-8 rounded-full" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
                             </a>
                             <div class="dropdown-menu dropdown-menu-right px-2 text-left mt-2">
-                                {{-- @can('update-videos')
-                                    <a href="{{ route('admin.index') }}" class="dropdown-item text-right">لوحة الإدارة</a>
-                                @endcan --}}
+                                @can('update-videos')
+                                    <a href="{{ route('admin.index') }}" class="dropdown-item">administration</a>
+                                @endcan
                                 <div class="pt-4 pb-1 border-t border-gray-200">
                                     <div class="flex items-center px-4">
                                         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())

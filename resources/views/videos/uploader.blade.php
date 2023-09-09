@@ -8,11 +8,11 @@
                 upload video
             </div>
 
-            {{-- @if (auth()->user()->block)
+            @if (auth()->user()->block)
                 <div class="alert alert-danger" role="alert">
-                    للأسف لا تستطيع رفع مقاطع فيديو، يرجى التواصل مع الإدارة لمعرفة السبب
+                    Unfortunately, you cannot upload video clips. Please contact the administration to find out the reason
                 </div>
-            @else --}}
+            @else
                 <div class="card-body">
                     <form action="{{ route('videos.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -66,7 +66,7 @@
 
                     </form>
                 </div>
-            {{-- @endif --}}
+            @endif
         </div>
     </div>
 </div>

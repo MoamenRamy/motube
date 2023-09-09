@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel, { refreshPaths } from 'laravel-vite-plugin';
+import Chart from 'chart.js/auto';
 
 export default defineConfig({
     plugins: [

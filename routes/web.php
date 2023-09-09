@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminsController;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HistoryController;
@@ -20,8 +21,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
+// Route::get('/admin', function () {
+//     return view('theme.default');
 // });
 
 Route::get('/', [MainController::class, 'index'])->name('main');
@@ -46,6 +47,18 @@ Route::delete('/distroyAll', [HistoryController::class, 'distroyAll'])->name('hi
 Route::get('/channel', [ChannelController::class, 'index'])->name('channels.index');
 Route::get('/channel/search', [ChannelController::class, 'search'])->name('channel.search');
 
+
+Route::prefix('/admin')->middleware('can:update-videos')->group(function() {
+    Route::get('/', [AdminsController::class, 'index'])->name('admin.index');
+    Route::get('/channels', [ChannelController::class, 'adminIndex'])->name('admin.channels.index');
+    Route::patch('/{channel}/channels', [ChannelController::class, 'adminUpdate'])->name('admin.channels.update')->middleware('can:update-users');
+    Route::delete('/channels/{channel}', [ChannelController::class, 'adminDestroy'])->name('admin.channels.delete')->middleware('can:update-users');
+    Route::patch('/{channel}/block', [ChannelController::class, 'adminBlock'])->name('admin.channels.block')->middleware('can:update-users');
+    Route::get('/channels/blocked', [ChannelController::class, 'blockedChannels'])->name('admin.blocked.channels');
+    Route::patch('/{channel}/unblock', [ChannelController::class, 'adminUnBlock'])->name('admin.channels.unblock')->middleware('can:update-users');
+    Route::get('/allChannels', [ChannelController::class, 'adminChannelsAll'])->name('admin.channels.all');
+    Route::get('/MostViewedVideos', [VideoController::class, 'mostViewedVideos'])->name('most.viewed.videos');
+});
 
 Route::middleware([
     'auth:sanctum',
