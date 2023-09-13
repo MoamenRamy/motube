@@ -19,6 +19,8 @@
 
     @vite(['resources/css/style.css'])
 
+    <link rel="stylesheet" href="{!! asset('theme/css/sb-admin-2.css') !!}">
+
 </head>
 <body>
     <div>
@@ -70,9 +72,9 @@
                         </a>
                     </li>
                 </ul>
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav">
                     <div class="topbar" style="z-index:1">
-                        {{-- @auth
+                        @auth
                             <!-- Nav Item - Alerts -->
                             <li class="nav-item dropdown no-arrow alert-dropdown mx-1">
                                 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
@@ -82,15 +84,15 @@
                                     <span class="badge badge-danger badge-counter notif-count" data-count="{{ App\Models\Alert::where('user_id', Auth::user()->id)->first()->alert }}">{{ App\Models\Alert::where('user_id', Auth::user()->id)->first()->alert }}</span>
                                 </a>
                                 <!-- Dropdown - Alerts -->
-                                <div class="dropdown-list dropdown-menu dropdown-menu-right text-right mt-2"
+                                <div class="dropdown-list dropdown-menu dropdown-menu-left mt-2"
                                     aria-labelledby="alertsDropdown">
                                     <div class="alert-body">
 
                                     </div>
-                                    <a class="dropdown-item text-center small text-gray-500" href="{{ route('all.Notification') }}">عرض جميع الإشعارات</a>
+                                    <a class="dropdown-item text-center small text-gray-500" href="{{route('all.notifications')}}">show all notifications</a>
                                 </div>
                             </li>
-                        @endauth --}}
+                        @endauth
                     </div>
                     @guest
                         <li class="nav-item mt-2">
@@ -106,7 +108,7 @@
                             <a id="navbarDropdown" class="nav-link" href="#" data-toggle="dropdown">
                                 <img class="h-8 w-8 rounded-full" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right px-2 text-left mt-2">
+                            <div class="dropdown-menu dropdown-menu-left px-2 text-left mt-2">
                                 @can('update-videos')
                                     <a href="{{ route('admin.index') }}" class="dropdown-item">administration</a>
                                 @endcan
@@ -196,6 +198,81 @@
             @yield('content')
         </main>
     </div>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('a79f5c0103d5bba8e980', {
+            cluster: 'mt1'
+        });
+
+    </script>
+
+    <script src="{{asset('js/pushNotifications.js')}}"></script>
+    <script src="{{asset('js/failedNotifications.js')}}"></script>
+
+    <script>
+        var token = '{{ Session::token() }}';
+        var urlNotify = '{{ route('notification') }}';
+
+        $('#alertsDropdown').on('click', function(event) {
+            event.preventDefault();
+            var notificationsWrapper = $('.alert-dropdown');
+            var notificationsToggle = notificationsWrapper.find('a[data-toggle]');
+            var notificationsCountElem = notificationsToggle.find('span[data-count]');
+
+            notificationsCount = 0;
+            notificationsCountElem.attr('data-count', notificationsCount);
+            notificationsWrapper.find('.notif-count').text(notificationsCount);
+            notificationsWrapper.show();
+
+            $.ajax({
+                method: 'POST',
+                url: urlNotify,
+                data: {
+                    _token: token
+                },
+                success : function(data) {
+                    var resposeNotifications = "";
+                    $.each(data.someNotifications , function(i, item) {
+                        var responseDate = new Date(item.created_at);
+                        var date = responseDate.getFullYear()+'-'+(responseDate.getMonth()+1)+'-'+responseDate.getDate();
+                        var time = responseDate.getHours() + ":" + responseDate.getMinutes() + ":" + responseDate.getSeconds();
+
+                        if (item.sucess) {
+                            resposeNotifications += '<a class="dropdown-item d-flex align-items-center" href="#">\
+                                                        <div class="mr-3">\
+                                                            <div class="icon-circle bg-secondary">\
+                                                                <i class="far fa-bell text-white"></i>\
+                                                            </div>\
+                                                        </div>\
+                                                        <div>\
+                                                            <div class="small text-gray-500">'+date+' hour '+time+'</div>\
+                                                            <span>Congratulations, your video has been processed <b>'+item.notification+'</b> successfuly</span>\
+                                                        </div>\
+                                                    </a>';
+                        } else {
+                            resposeNotifications += '<a class="dropdown-item d-flex align-items-center" href="#">\
+                                                        <div class="mr-3">\
+                                                            <div class="icon-circle bg-secondary">\
+                                                                <i class="far fa-bell text-white"></i>\
+                                                            </div>\
+                                                        </div>\
+                                                        <div>\
+                                                            <div class="small text-gray-500">'+date+' hour '+time+'</div>\
+                                                            <span>Unfortunately, an unexpected error occurred while processing the video <b>'+item.notification+'</b> Please upload it again</span>\
+                                                        </div>\
+                                                    </a>';
+                        }
+
+                        $('.alert-body').html(resposeNotifications);
+                    });
+                }
+            });
+        });
+    </script>
     @yield('script')
 </body>
 </html>

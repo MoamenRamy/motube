@@ -77,9 +77,9 @@ a {
     color: #3333FF;
 }
 
-.dropdown-menu-right {
-    right: auto !important;
-    left: 0 !important;
+.dropdown-menu-left {
+    left: auto !important;
+    right: 0 !important;
 }
 
 .dropdown-list {

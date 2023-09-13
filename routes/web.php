@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VideoController;
 use App\Models\Video;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,9 @@ Route::prefix('/admin')->middleware('can:update-videos')->group(function() {
     Route::get('/MostViewedVideos', [VideoController::class, 'mostViewedVideos'])->name('most.viewed.videos');
 });
 
+Route::post('/Notifications', [NotificationController::class, 'index'])->name('notification');
+Route::get('/Notifications', [NotificationController::class, 'allNotifications'])->name('all.notifications');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -67,6 +71,6 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', function () {
         return view('layouts.main');
-    })->name('/dashboard');
+    })->name('dashboard');
 });
 

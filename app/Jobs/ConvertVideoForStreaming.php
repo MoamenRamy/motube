@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
-
+use App\Events\FailedNotification;
+use App\Events\RealNotification;
+use App\Models\Alert;
 use Illuminate\Bus\Queueable;
 // use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,17 +13,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 
-// use App\Events\RealNotification;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Format\Video\X264;
 use App\Models\Video;
 use FFMpeg\Format\Video\WebM;
 use Storage;
 use App\Models\Convertedvideo;
+use App\Models\Notification;
 use FFMpeg\Filters\Video\VideoFilters;
-// use App\Models\Notification;
-// use App\Models\Alert;
-// use App\Events\FailedNotification;
 // use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use FFMpeg;
 
@@ -193,6 +192,25 @@ class ConvertVideoForStreaming implements ShouldQueue
 
         $converted_video->save();
 
+        $notifications = new Notification();
+
+        $notifications->user_id = $this->video->user_id;
+        $notifications->notification = $this->video->title;
+        $notifications->save();
+
+        $data = [
+            'video_title' => $this->video->title,
+        ];
+
+        event(new RealNotification($data));
+
+        $alert = Alert::where('user_id', $this->video->user_id)->first();
+
+        $alert->alert++;
+        $alert->save();
+
+
+
         $this->video->update([
             'processed' => true,
             'hours' => $hours,
@@ -204,5 +222,26 @@ class ConvertVideoForStreaming implements ShouldQueue
 
     private function getFileName($filename, $type) {
         return preg_replace('/\\.[^.\\s]{3,4}$/', '', $filename) .$type;
+    }
+
+    public function failed()
+    {
+
+        $notification = new Notification();
+        $notification->notification = $this->video->title;
+        $notification->user_id = $this->video->user_id;
+        $notification->sucess = false;
+        $notification->save();
+
+        $data = [
+            'video_title' => $this->video->title,
+        ];
+
+        event(new FailedNotification($data));
+
+        $alert = Alert::where('user_id', $this->video->user_id)->first();
+
+        $alert->alert++;
+        $alert->save();
     }
 }
